@@ -107,7 +107,7 @@ python -m unittest discover -s tests -v
 python -m compileall -q scripts tests
 ```
 
-O CI verifica o pacote e os testes em Windows e Linux com Python 3.10 e 3.12. A análise estática CodeQL verifica Python; o Dependabot prepara atualizações mensais e agrupadas das Actions, sempre por PR. Configurar controles não equivale a afirmar sucesso: consulte os resultados reais no badge e nas execuções do GitHub. Os auxiliares da skill continuam offline e sem dependências externas.
+O CI verifica o pacote e os testes em Windows e Linux com Python 3.10 e 3.12. A análise estática CodeQL verifica Python; o ClusterFuzzLite/Atheris testa invariantes do validador, escalonador e renderizador com entradas adversariais, em um orçamento de 60 segundos por run; o Dependabot prepara atualizações mensais e agrupadas das Actions, sempre por PR. O SDK de fuzzing é exclusivo do CI e não integra as dependências de execução da skill. Configurar controles não equivale a afirmar sucesso: consulte os resultados reais no badge e nas execuções do GitHub. Os auxiliares da skill continuam offline e sem dependências externas.
 
 Contribuições: [CONTRIBUTING.md](CONTRIBUTING.md). Integração por PR e squash, nunca rebase. Versões e changelog são derivados de Commits Convencionais; esta skill não é um pacote publicado em npm ou PyPI.
 
