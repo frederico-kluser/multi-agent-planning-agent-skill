@@ -1,0 +1,12 @@
+{
+  "plan_digest": "037388f243c744761399afe2528c6ba98f67a838d50df4dfba8b9d8372eafc56",
+  "task_id": "T1",
+  "status": "BLOCKED",
+  "files_touched": [],
+  "verification": [],
+  "acceptance_passed": [],
+  "notes": [
+    "Exemplo sintético de formato: a implementação da aplicação de demonstração não foi iniciada.",
+    "Nenhum comando de teste da aplicação foi executado; isto não é uma tarefa verificada."
+  ]
+}
