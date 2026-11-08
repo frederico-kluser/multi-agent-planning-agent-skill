@@ -25,6 +25,7 @@ Correções serão priorizadas na versão mais recente mantida. Este projeto com
 - Scan de segredos antes de push e proteção de segredos no GitHub quando disponível.
 - PRs e checks em ramos protegidos; squash merge, sem rebase/force-push.
 - Actions fixadas por SHA, permissões mínimas e timeout por job.
-- CI offline do pacote e análise OpenSSF Scorecard.
+- Testes offline do pacote, análise estática CodeQL e monitoramento OpenSSF Scorecard.
+- Atualizações mensais agrupadas das Actions via Dependabot, submetidas por PR.
 
 Configuração versionada não prova ativação remota, sucesso de CI nem uma pontuação OpenSSF específica. Verifique os resultados reais; uma pontuação abaixo da meta deve ser tratada como trabalho de hardening, não ocultada.
