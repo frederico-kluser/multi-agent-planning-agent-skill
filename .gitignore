@@ -1,0 +1,43 @@
+# Python and editors
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*.log
+
+# Secrets and private inputs
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+.git-credentials
+secrets/
+credentials/
+attachments/
+assets/private/
+references/private/
+Skill de Planejamento Multi-Agente.md
+
+# Local run state, outputs and governance captures
+.local/
+publication.local/
+*.local.md
+*.local.json
+run-state*.json
+reports/
+docs/plans/
+.worktrees/
+skill-dist/
+.tmp-skills/
+*.zip
+*.tar.gz
+
+# Public examples and generated CHANGELOG remain versioned.

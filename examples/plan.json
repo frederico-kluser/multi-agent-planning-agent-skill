@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "plan_id": "portable-record-key",
+  "title": "Portable record key formatter",
+  "goal": "Normalize a label, encode it as a portable key and format one deterministic text record.",
+  "architecture": "Four small pure Python modules. Normalization and encoding are independent; composition consumes both frozen interfaces; record formatting consumes composition.",
+  "max_parallel": 3,
+  "context": {"stack": ["Python 3.10+", "stdlib unittest"], "test_runner": "python -m unittest discover -s tests -v"},
+  "requirements": [
+    {"id": "R1", "text": "Normalize labels by stripping surrounding whitespace and applying Unicode casefold; reject empty results."},
+    {"id": "R2", "text": "Percent-encode UTF-8 bytes except ASCII letters, digits, underscore and hyphen; hexadecimal digits are uppercase."},
+    {"id": "R3", "text": "Compose normalization and encoding without duplicating their algorithms."},
+    {"id": "R4", "text": "Format a record as key=<encoded-key> with no newline or additional fields."}
+  ],
+  "decisions": [{"id": "D1", "text": "Functions are pure. Type errors and empty-label errors propagate; no I/O, global mutation, caching or package installation."}],
+  "anti_scope": ["No network, APIs, LLM calls or subprocesses in the sample modules.", "Do not modify package configuration, shared plan/state or files outside the task's allowed list.", "Workers in a shared workspace do not stage, commit, push, rebase or otherwise mutate Git."],
+  "interfaces": [
+    {"id": "I1", "producer": "T1", "file": "sample/normalization.py", "signature": "def normalize_label(label: str) -> str"},
+    {"id": "I2", "producer": "T2", "file": "sample/encoding.py", "signature": "def encode_key(value: str) -> str"},
+    {"id": "I3", "producer": "T3", "file": "sample/composition.py", "signature": "def build_key(label: str) -> str"}
+  ],
+  "tasks": [
+    {
+      "id": "T1", "title": "Implement pure label normalization", "depends_on": [], "profile": "standard-implementer",
+      "files_allowed": ["sample/normalization.py", "tests/test_normalization.py"], "files_forbidden": ["docs/", "scripts/"], "files_read": [], "resources": [],
+      "functions": [{"name": "normalize_label", "file": "sample/normalization.py", "signature": "def normalize_label(label: str) -> str", "contains": ["Reject non-string inputs with TypeError.", "Return label.strip().casefold(); raise ValueError if the result is empty."], "does_not_contain": ["No encoding, record formatting, I/O, global mutation or caching."]}],
+      "consumes": [], "produces": ["I1"], "requirement_ids": ["R1"], "decision_ids": ["D1"],
+      "acceptance": [{"id": "AC1", "text": "normalize_label('  AbC  ') returns 'abc'; normalize_label('STRASSE') returns 'strasse'."}, {"id": "AC2", "text": "Whitespace-only input raises ValueError and non-string input raises TypeError."}],
+      "verification": {"red": {"command": "python -m unittest discover -s tests -p test_normalization.py -v", "timeout_seconds": 30}, "red_reason": "", "green": {"command": "python -m unittest discover -s tests -p test_normalization.py -v", "timeout_seconds": 30}}
+    },
+    {
+      "id": "T2", "title": "Implement deterministic UTF-8 key encoding", "depends_on": [], "profile": "standard-implementer",
+      "files_allowed": ["sample/encoding.py", "tests/test_encoding.py"], "files_forbidden": ["docs/", "scripts/"], "files_read": [], "resources": [],
+      "functions": [{"name": "encode_key", "file": "sample/encoding.py", "signature": "def encode_key(value: str) -> str", "contains": ["Reject non-string inputs with TypeError.", "Encode UTF-8 bytes; preserve ASCII A-Z, a-z, 0-9, underscore and hyphen; encode all other bytes as %HH using uppercase hex."], "does_not_contain": ["No normalization, record formatting, network or writes."]}],
+      "consumes": [], "produces": ["I2"], "requirement_ids": ["R2"], "decision_ids": ["D1"],
+      "acceptance": [{"id": "AC3", "text": "encode_key('A b') returns 'A%20b'; encode_key('é') returns '%C3%A9'; encode_key('a_b-1') is unchanged."}],
+      "verification": {"red": {"command": "python -m unittest discover -s tests -p test_encoding.py -v", "timeout_seconds": 30}, "red_reason": "", "green": {"command": "python -m unittest discover -s tests -p test_encoding.py -v", "timeout_seconds": 30}}
+    },
+    {
+      "id": "T3", "title": "Compose the two frozen interfaces", "depends_on": ["T1", "T2"], "profile": "fast-mechanical",
+      "files_allowed": ["sample/composition.py", "tests/test_composition.py"], "files_forbidden": ["docs/", "scripts/"], "files_read": ["sample/normalization.py", "sample/encoding.py"], "resources": [],
+      "functions": [{"name": "build_key", "file": "sample/composition.py", "signature": "def build_key(label: str) -> str", "contains": ["Import normalize_label and encode_key from their declared modules.", "Return encode_key(normalize_label(label)); propagate their errors unchanged."], "does_not_contain": ["No duplicate normalization/encoding algorithm, error swallowing, I/O or global mutation."]}],
+      "consumes": [{"interface": "I1", "signature": "def normalize_label(label: str) -> str"}, {"interface": "I2", "signature": "def encode_key(value: str) -> str"}], "produces": ["I3"], "requirement_ids": ["R3"], "decision_ids": ["D1"],
+      "acceptance": [{"id": "AC4", "text": "build_key('  Ab C  ') returns 'ab%20c'; empty input raises ValueError without masking the exception."}],
+      "verification": {"red": {"command": "python -m unittest discover -s tests -p test_composition.py -v", "timeout_seconds": 30}, "red_reason": "", "green": {"command": "python -m unittest discover -s tests -p test_composition.py -v", "timeout_seconds": 30}}
+    },
+    {
+      "id": "T4", "title": "Format the final deterministic text record", "depends_on": ["T3"], "profile": "fast-mechanical",
+      "files_allowed": ["sample/record.py", "tests/test_record.py"], "files_forbidden": ["docs/", "scripts/"], "files_read": ["sample/composition.py"], "resources": [],
+      "functions": [{"name": "format_record", "file": "sample/record.py", "signature": "def format_record(label: str) -> str", "contains": ["Import build_key from sample/composition.py.", "Return 'key=' + build_key(label) with no trailing newline; propagate errors."], "does_not_contain": ["No extra fields, serialization framework, logging, I/O or mutable shared state."]}],
+      "consumes": [{"interface": "I3", "signature": "def build_key(label: str) -> str"}], "produces": [], "requirement_ids": ["R4"], "decision_ids": ["D1"],
+      "acceptance": [{"id": "AC5", "text": "format_record('  Ab C  ') returns exactly 'key=ab%20c', including absence of a newline."}],
+      "verification": {"red": {"command": "python -m unittest discover -s tests -p test_record.py -v", "timeout_seconds": 30}, "red_reason": "", "green": {"command": "python -m unittest discover -s tests -p test_record.py -v", "timeout_seconds": 30}}
+    }
+  ],
+  "final_checks": [{"command": "python -m unittest discover -s tests -v", "timeout_seconds": 120}]
+}
