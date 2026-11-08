@@ -65,7 +65,7 @@ commit_parsers = [
 ]
 
 # Keep breaking changes visible even when their type would skip them.
-protect_breaking_commits = false
+protect_breaking_commits = true
 filter_commits = false
 
 # Only tags like v1.2.3 start a new changelog section.
