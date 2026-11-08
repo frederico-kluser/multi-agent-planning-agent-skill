@@ -44,6 +44,12 @@ Os links são referências para consulta e manutenção, não declaração de qu
 versões futuras foram testadas. Não execute comandos publicados nesses documentos
 sem verificar sua pertinência e autorização no projeto alvo.
 
+O hardening de CI usa [CodeQL](https://github.com/github/codeql-action) e
+[ClusterFuzzLite](https://github.com/google/clusterfuzzlite), com SDK Python/Atheris
+oficial e referências fixadas. São ferramentas de desenvolvimento executadas no
+GitHub Actions, não dependências do helper instalado. O fuzzer deste projeto é
+próprio, usa somente dados públicos sintéticos e não executa comandos dos planos.
+
 ## 3. Influências conceituais, não dependências
 
 As referências abaixo foram mencionadas no material de origem e ilustram padrões
