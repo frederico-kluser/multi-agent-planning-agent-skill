@@ -107,7 +107,7 @@ python -m unittest discover -s tests -v
 python -m compileall -q scripts tests
 ```
 
-O CI verifica o pacote e os testes em Windows e Linux com Python 3.10 e 3.12. Configurar a matriz não equivale a afirmar que um run remoto já passou; consulte o estado real no badge e nas execuções do GitHub.
+O CI verifica o pacote e os testes em Windows e Linux com Python 3.10 e 3.12. A análise estática CodeQL verifica Python; o Dependabot prepara atualizações mensais e agrupadas das Actions, sempre por PR. Configurar controles não equivale a afirmar sucesso: consulte os resultados reais no badge e nas execuções do GitHub. Os auxiliares da skill continuam offline e sem dependências externas.
 
 Contribuições: [CONTRIBUTING.md](CONTRIBUTING.md). Integração por PR e squash, nunca rebase. Versões e changelog são derivados de Commits Convencionais; esta skill não é um pacote publicado em npm ou PyPI.
 
