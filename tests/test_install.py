@@ -139,7 +139,8 @@ class InstallerTests(unittest.TestCase):
             self.assertFalse(INSTALLER.is_link(self.source))
 
     def test_nested_root_resource_checks_its_linked_parent(self):
-        linked_parent = self.source / ".github"
+        # Hosted Windows TEMP may use an 8.3 username; install resolves the source.
+        linked_parent = self.source.resolve(strict=True) / ".github"
         with patch.object(INSTALLER, "is_link", side_effect=lambda path: path == linked_parent):
             with self.assertRaisesRegex(ValueError, "links"):
                 INSTALLER.install(self.source, self.root)
